@@ -1,5 +1,6 @@
 {
   "name": "Slayer Training Samuel",
+  "id": "/entrenamiento"
   "short_name": "SlayerFit",
   "start_url": "entrenamiento.html",
   "display": "standalone",
