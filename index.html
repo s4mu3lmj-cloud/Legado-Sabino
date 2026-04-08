@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OmniAdmin - Samuel</title>
+    <link rel="manifest" href="manifest.json">
+    <style>
+        :root {
+            --bg: #0a0a0a;
+            --card: #1a1a1a;
+            --primary: #d4a373; /* Color Mezcal */
+            --accent: #81c784; /* Ingresos */
+            --danger: #e57373; /* Gastos */
+            --text: #ffffff;
+        }
+
+        body { font-family: sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 70px; }
+        .header { background: var(--card); padding: 20px; text-align: center; border-bottom: 2px solid var(--primary); }
+        .container { padding: 15px; }
+
+        /* Navegación Inferior */
+        .navbar {
+            position: fixed; bottom: 0; width: 100%; background: var(--card);
+            display: flex; justify-content: space-around; padding: 10px 0;
+            border-top: 1px solid #333;
+        }
+        .nav-item { background: none; border: none; color: #888; font-size: 12px; cursor: pointer; }
+        .nav-item.active { color: var(--primary); font-weight: bold; }
+
+        /* Secciones */
+        .section { display: none; animation: fadeIn 0.3s; }
+        .section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* Cards */
+        .card { background: var(--card); padding: 15px; border-radius: 15px; margin-bottom: 15px; }
+        .balance { font-size: 2rem; color: var(--accent); margin: 10px 0; }
+        
+        button { 
+            width: 100%; padding: 12px; margin: 5px 0; border-radius: 10px; border: none;
+            font-weight: bold; cursor: pointer; transition: 0.2s;
+        }
+        .btn-main { background: var(--primary); color: black; }
+        .btn-in { background: var(--accent); color: black; }
+        .btn-out { background: var(--danger); color: black; }
+
+        .list-item { 
+            display: flex; justify-content: space-between; padding: 10px;
+            border-bottom: 1px solid #333; font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h2 id="view-title">Dashboard</h2>
+    </div>
+
+    <div class="container">
+        <div id="sec-dash" class="section active">
+            <div class="card">
+                <small>Capital Total Disponible</small>
+                <div class="balance" id="total-global">$0.00</div>
+            </div>
+            <div class="card">
+                <h3>Resumen Mezcal</h3>
+                <p>Ventas este mes: <span id="dash-ventas">0</span></p>
+                <p>Ganancia neta: <span id="dash-ganancia" style="color:var(--accent)">$0</span></p>
+            </div>
+        </div>
+
+        <div id="sec-mezcal" class="section">
+            <div class="card">
+                <h3>Los 5 Magueyes</h3>
+                <p>Precio botella: $350 MXN</p>
+                <button class="btn-in" onclick="addMov('Venta Papalomé', 350, 'mezcal')">+ Registrar Venta</button>
+                <button class="btn-main" onclick="promptInsumo()">- Registrar Insumo (Botellas/Etiquetas)</button>
+            </div>
+            <div class="card">
+                <h3>Inventario Estimado</h3>
+                <p id="inv-count">Cargando...</p>
+            </div>
+        </div>
+
+        <div id="sec-gastos" class="section">
+            <div class="card">
+                <h3>Gastos Diarios</h3>
+                <button class="btn-out" onclick="promptGasto()">- Registrar Gasto Nuevo</button>
+            </div>
+            <div id="lista-gastos"></div>
+        </div>
+
+        <div id="sec-proyectos" class="section">
+            <div class="card">
+                <h3>Meta: Próximo Proyecto</h3>
+                <input type="number" id="meta-val" placeholder="Monto meta" onchange="saveMeta()">
+                <div style="background:#333; height:15px; border-radius:10px; margin:15px 0;">
+                    <div id="bar" style="background:var(--primary); height:100%; width:0%; border-radius:10px;"></div>
+                </div>
+                <p id="meta-txt">0% alcanzado</p>
+            </div>
+        </div>
+    </div>
+
+    <nav class="navbar">
+        <button class="nav-item active" onclick="show('dash', this)">🏠<br>Inicio</button>
+        <button class="nav-item" onclick="show('mezcal', this)">🥃<br>Mezcal</button>
+        <button class="nav-item" onclick="show('gastos', this)">💸<br>Gastos</button>
+        <button class="nav-item" onclick="show('proyectos', this)">🚀<br>Metas</button>
+    </nav>
+
+    <script>
+        let db = JSON.parse(localStorage.getItem('omni_db')) || { movs: [], meta: 5000 };
+
+        function show(id, btn) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById('sec-' + id).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById('view-title').innerText = id.toUpperCase();
+            updateUI();
+        }
+
+        function addMov(desc, monto, tipo) {
+            db.movs.unshift({ desc, monto: parseFloat(monto), tipo, fecha: new Date().toLocaleDateString() });
+            save();
+        }
+
+        function promptGasto() {
+            const d = prompt("¿En qué gastaste?");
+            const m = prompt("¿Cuánto?");
+            if(d && m) addMov(d, m, 'personal');
+        }
+
+        function promptInsumo() {
+            const d = prompt("¿Qué insumo compraste?");
+            const m = prompt("Costo:");
+            if(d && m) addMov("Insumo: " + d, m, 'insumo');
+        }
+
+        function saveMeta() {
+            db.meta = document.getElementById('meta-val').value;
+            save();
+        }
+
+        function save() {
+            localStorage.setItem('omni_db', JSON.stringify(db));
+            updateUI();
+        }
+
+        function updateUI() {
+            let total = 0;
+            let v_mezcal = 0;
+            let g_mezcal = 0;
+            const lista = document.getElementById('lista-gastos');
+            lista.innerHTML = '';
+
+            db.movs.forEach(m => {
+                if(m.tipo === 'mezcal') { 
+                    total += m.monto; v_mezcal++; 
+                } else { 
+                    total -= m.monto; 
+                    if(m.tipo === 'insumo') g_mezcal += m.monto;
+                }
+                
+                // Mostrar solo gastos personales en la pestaña de gastos
+                if(m.tipo === 'personal') {
+                    lista.innerHTML += `<div class="list-item"><span>${m.desc}</span><span style="color:var(--danger)">-$${m.monto}</span></div>`;
+                }
+            });
+
+            document.getElementById('total-global').innerText = `$${total.toLocaleString()}`;
+            document.getElementById('dash-ventas').innerText = v_mezcal;
+            document.getElementById('dash-ganancia').innerText = `$${(v_mezcal * 350) - g_mezcal}`;
+            
+            // Barra de progreso
+            let perc = Math.min((total / db.meta) * 100, 100);
+            document.getElementById('bar').style.width = (perc > 0 ? perc : 0) + '%';
+            document.getElementById('meta-txt').innerText = `${Math.round(perc)}% alcanzado para tu meta`;
+            document.getElementById('meta-val').value = db.meta;
+        }
+
+        updateUI();
+    </script>
+</body>
+</html>
