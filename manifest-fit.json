@@ -1,0 +1,15 @@
+{
+  "name": "Slayer Training Samuel",
+  "short_name": "SlayerFit",
+  "start_url": "entrenamiento.html",
+  "display": "standalone",
+  "background_color": "#0b0f12",
+  "theme_color": "#5eb7b7",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/5169/5169999.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

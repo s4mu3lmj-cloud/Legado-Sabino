@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Slayer Training - Muichiro Style</title>
+    <style>
+        :root {
+            --bg: #0b0f12;
+            --card: #151d24;
+            --tokito-main: #5eb7b7; /* Azul Turquesa Muichiro */
+            --tokito-dark: #2d4f52;
+            --accent: #ffffff;
+            --success: #00ffcc;
+            --text: #e0e0e0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding-bottom: 80px;
+        }
+
+        header {
+            background: linear-gradient(180deg, var(--tokito-dark), var(--bg));
+            padding: 25px 15px;
+            text-align: center;
+            border-bottom: 2px solid var(--tokito-main);
+        }
+
+        header h1 { margin: 0; font-size: 1.5rem; letter-spacing: 2px; color: var(--tokito-main); }
+        header p { margin: 5px 0 0; font-size: 0.8rem; opacity: 0.8; }
+
+        .container { padding: 15px; max-width: 500px; margin: auto; }
+
+        /* Estilos Calendario */
+        .card {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            border: 1px solid #25333d;
+        }
+
+        .calendar-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 15px; color: var(--tokito-main); font-weight: bold;
+            text-transform: capitalize;
+        }
+
+        .grid-dias { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; text-align: center; }
+        .dia-semana { font-size: 0.7rem; color: var(--tokito-main); opacity: 0.6; font-weight: bold; }
+        .dia {
+            aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
+            border-radius: 6px; font-size: 0.85rem; background: #1c262f;
+            border: 1px solid #25333d; transition: 0.3s;
+        }
+        .dia.hoy { border-color: var(--tokito-main); color: var(--tokito-main); font-weight: bold; }
+        .dia.entrenado { background: var(--tokito-main); color: var(--bg); font-weight: bold; box-shadow: 0 0 10px var(--tokito-main); }
+
+        /* Rutinas */
+        .view { display: none; }
+        .active { display: block; }
+
+        .rutina-box { border-left: 4px solid var(--tokito-main); padding-left: 15px; margin-bottom: 20px; }
+        .rutina-box h3 { color: var(--tokito-main); margin-bottom: 5px; font-size: 1.1rem; }
+        .rutina-box p { font-size: 0.8rem; color: #888; margin-top: 0; }
+        
+        ul { list-style: none; padding: 0; margin: 10px 0; }
+        li { padding: 8px 0; border-bottom: 1px solid #25333d; display: flex; justify-content: space-between; font-size: 0.9rem; }
+        li:last-child { border-bottom: none; }
+
+        /* Botón Registro */
+        .btn-check {
+            background: var(--tokito-main);
+            color: var(--bg);
+            border: none;
+            padding: 16px;
+            border-radius: 8px;
+            width: 100%;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 10px;
+        }
+
+        .btn-check:disabled { background: #333; color: #777; }
+
+        /* Navegación */
+        .nav {
+            position: fixed; bottom: 0; width: 100%;
+            background: #090c0e; display: flex; justify-content: space-around;
+            padding: 15px 0; border-top: 1px solid var(--tokito-dark);
+        }
+
+        .nav-btn { color: #555; text-decoration: none; font-size: 0.75rem; cursor: pointer; text-align: center; }
+        .nav-btn.active { color: var(--tokito-main); font-weight: bold; }
+        .nav-icon { font-size: 1.2rem; display: block; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>SLAYER NIEBLA LOG</h1>
+    <p>Samuel • Aliento de la Niebla & PDMU</p>
+</header>
+
+<div class="container">
+    
+    <div id="inicio" class="view active">
+        <div class="card">
+            <div class="calendar-header" id="mes-nombre"></div>
+            <div class="grid-dias" id="grid-calendario"></div>
+        </div>
+
+        <button class="btn-check" id="btn-registro" onclick="registrarEntrenamiento()">Registrar Misión Cumplida</button>
+        
+        <div style="text-align: center; margin-top: 20px; color: #555; font-style: italic;">
+            <p>"Como la niebla, sé indescifrable y eficiente en cualquier terreno."</p>
+        </div>
+    </div>
+
+    <div id="rutinas" class="view">
+        <h2 style="color:var(--tokito-main)">Misiones Semanales</h2>
+        
+        <div class="rutina-box">
+            <h3>Lunes y Jueves: Pilar Llama (Fuerza)</h3>
+            <p>Enfoque: Tren Superior y Estética</p>
+            <ul>
+                <li><span>Press Militar (Manc 8lb)</span> <span>4 x 20</span></li>
+                <li><span>Vuelos Laterales (Manc 8lb)</span> <span>4 x 15</span></li>
+                <li><span>Flexiones de Pecho</span> <span>4 x 20</span></li>
+                <li><span>Fondos en silla</span> <span>3 x Max</span></li>
+            </ul>
+        </div>
+
+        <div class="rutina-box" style="border-left-color: #888;">
+            <h3>Martes y Viernes: Agilidad PDMU</h3>
+            <p>Enfoque: Resistencia y Cualquier Terreno</p>
+            <ul>
+                <li><span>Zancadas (Manc 8lb)</span> <span>4 x 15 p/p</span></li>
+                <li><span>Sentadilla Sumo (Manc 8lb)</span> <span>4 x 25</span></li>
+                <li><span>Burpees Militares</span> <span>4 x 12</span></li>
+                <li><span>Escaladores (Agilidad)</span> <span>3 x 45s</span></li>
+            </ul>
+        </div>
+
+        <div class="rutina-box" style="border-left-color: var(--success);">
+            <h3>Miércoles y Sábado: Estilo Muichiro</h3>
+            <p>Enfoque: Flexibilidad, Abdomen y Control</p>
+            <ul>
+                <li><span>Plancha Abdominal</span> <span>3 x 1 min</span></li>
+                <li><span>Elevación de Piernas</span> <span>4 x 15</span></li>
+                <li><span>Crunch Abdominal</span> <span>4 x 25</span></li>
+                <li><span>Estiramiento profundo</span> <span>15 min</span></li>
+            </ul>
+        </div>
+    </div>
+
+</div>
+
+<nav class="nav">
+    <div class="nav-btn active" onclick="cambiarVista('inicio', this)">
+        <span class="nav-icon">☁️</span>PROGRESO
+    </div>
+    <div class="nav-btn" onclick="cambiarVista('rutinas', this)">
+        <span class="nav-icon">⚔️</span>RUTINAS
+    </div>
+</nav>
+
+<script>
+    // Almacenamiento local para Samuel
+    let historial = JSON.parse(localStorage.getItem('samuel_slayer_v3')) || [];
+
+    function generarCalendario() {
+        const grid = document.getElementById('grid-calendario');
+        const ahora = new Date();
+        const mes = ahora.getMonth();
+        const año = ahora.getFullYear();
+        
+        const meses = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
+        document.getElementById('mes-nombre').innerText = `${meses[mes]} ${año}`;
+
+        grid.innerHTML = '';
+        ['D','L','M','M','J','V','S'].forEach(d => grid.innerHTML += `<div class="dia-semana">${d}</div>`);
+
+        const primerDia = new Date(año, mes, 1).getDay();
+        const diasEnMes = new Date(año, mes + 1, 0).getDate();
+
+        for (let i = 0; i < primerDia; i++) grid.innerHTML += `<div></div>`;
+
+        for (let d = 1; d <= diasEnMes; d++) {
+            const fechaKey = `${d}/${mes+1}/${año}`;
+            const esHoy = d === ahora.getDate() ? 'hoy' : '';
+            const entrenado = historial.includes(fechaKey) ? 'entrenado' : '';
+            grid.innerHTML += `<div class="dia ${esHoy} ${entrenado}">${d}</div>`;
+        }
+
+        const hoyKey = `${ahora.getDate()}/${ahora.getMonth()+1}/${ahora.getFullYear()}`;
+        if(historial.includes(hoyKey)) {
+            const btn = document.getElementById('btn-registro');
+            btn.innerText = "MISIÓN CUMPLIDA";
+            btn.disabled = true;
+        }
+    }
+
+    function registrarEntrenamiento() {
+        const ahora = new Date();
+        const hoyKey = `${ahora.getDate()}/${ahora.getMonth()+1}/${ahora.getFullYear()}`;
+        if(!historial.includes(hoyKey)) {
+            historial.push(hoyKey);
+            localStorage.setItem('samuel_slayer_v3', JSON.stringify(historial));
+            generarCalendario();
+        }
+    }
+
+    function cambiarVista(vista, btn) {
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(vista).classList.add('active');
+        btn.classList.add('active');
+    }
+
+    generarCalendario();
+</script>
+
+</body>
+</html>
